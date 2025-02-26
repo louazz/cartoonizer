@@ -7,7 +7,7 @@ from flask_jwt_extended import jwt_required
 import subprocess
 from datetime import timedelta
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os 
 from cartoonize import cartoonize
 
@@ -18,7 +18,8 @@ app.config['JWT_SECRET_KEY']= "louai"
 app.config['JWT_TOKEN_LOCATION'] = ['headers']
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1000)
 jwt = JWTManager(app)
-@app.route("/api/login", methods = ["POST"])
+@app.route("/api/login", methods = ["POST", 'OPTIONS'])
+@cross_origin(origin='*')
 def login():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
@@ -30,7 +31,8 @@ def login():
     access_token = create_access_token(identity=user[0]['id'])
     return jsonify({"token": access_token}), 200
 
-@app.route("/api/signup", methods= ["POST"])
+@app.route("/api/signup", methods= ["POST", 'OPTIONS'])
+@cross_origin(origin='*')
 def singup():
     username = request.json.get("username", None)
     password = request.json.get("password", None)
@@ -41,21 +43,21 @@ def singup():
     addUser(email=email, password=pw_hash.decode("utf-8"), username=username)
     return jsonify({"msg": "User created"}), 200
 
-@app.route("/api/photo/find", methods = ["GET"])
+@app.route("/api/photo/find", methods = ["GET", 'OPTIONS'])
 @jwt_required()
 def search():
     user = get_jwt_identity()
     photos = findById(user)
     return jsonify({"photos": photos}), 200
 
-@app.route("/api/photo/id", methods = ["GET"])
+@app.route("/api/photo/id", methods = ["GET", 'OPTIONS'])
 @jwt_required()
 def findDoc():
     request.args.get('id')
     photo = findByPhoto(request.para)
     return jsonify({"photo": photo}), 200
 
-@app.route("/api/photo", methods = ["POST"])
+@app.route("/api/photo", methods = ["POST", 'OPTIONS'])
 @jwt_required()
 def CreatePhoto():
     user = get_jwt_identity()
@@ -70,7 +72,7 @@ def CreatePhoto():
     cartoonize("./uploads/"+ str(id)+"/cartoonized."+type, "./uploads/"+ str(id)+"/"+file.filename)
     return send_file("./uploads/"+ str(id)+"/cartoonized."+type, as_attachment=True, download_name="cartoonized."+type)
 
-@app.route("/api/photo/download", methods=["POST"])
+@app.route("/api/photo/download", methods=["POST", 'OPTIONS'])
 def download():
     id = request.json.get("id", None)
     name = request.json.get("name", None)
@@ -84,7 +86,7 @@ def download():
         print("valid path")
         return send_file(file_path, download_name=name, as_attachment=True)
 
-@app.route("/api/photo/delete", methods= ["POST"])
+@app.route("/api/photo/delete", methods= ["POST", 'OPTIONS'])
 @jwt_required()
 def delete():
     id = request.json.get("id", None)

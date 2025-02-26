@@ -5,3 +5,8 @@ services:
     image: cartoonizer
     ports: 
       - "5000:5000"
+
+  client:
+    image: frontend
+    ports: 
+      - "3001:3001"
