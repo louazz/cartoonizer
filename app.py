@@ -44,6 +44,7 @@ def singup():
     return jsonify({"msg": "User created"}), 200
 
 @app.route("/api/photo/find", methods = ["GET", 'OPTIONS'])
+@cross_origin(origin='*')
 @jwt_required()
 def search():
     user = get_jwt_identity()
@@ -51,6 +52,7 @@ def search():
     return jsonify({"photos": photos}), 200
 
 @app.route("/api/photo/id", methods = ["GET", 'OPTIONS'])
+@cross_origin(origin='*')
 @jwt_required()
 def findDoc():
     request.args.get('id')
@@ -58,6 +60,7 @@ def findDoc():
     return jsonify({"photo": photo}), 200
 
 @app.route("/api/photo", methods = ["POST", 'OPTIONS'])
+@cross_origin(origin='*')
 @jwt_required()
 def CreatePhoto():
     user = get_jwt_identity()
@@ -73,6 +76,7 @@ def CreatePhoto():
     return send_file("./uploads/"+ str(id)+"/cartoonized."+type, as_attachment=True, download_name="cartoonized."+type)
 
 @app.route("/api/photo/download", methods=["POST", 'OPTIONS'])
+@cross_origin(origin='*')
 def download():
     id = request.json.get("id", None)
     name = request.json.get("name", None)
@@ -87,6 +91,7 @@ def download():
         return send_file(file_path, download_name=name, as_attachment=True)
 
 @app.route("/api/photo/delete", methods= ["POST", 'OPTIONS'])
+@cross_origin(origin='*')
 @jwt_required()
 def delete():
     id = request.json.get("id", None)
